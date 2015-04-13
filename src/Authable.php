@@ -3,15 +3,14 @@
 namespace Firehed\Auth;
 
 use Firehed\Common\OpaqueEnvelope as OE;
-use Firehed\Auth\Factors as F;
 
 interface Authable {
 
+    public function getAuthFactorNotValidBeforeTime()/*: ?\DateTime*/;
+
     public function getID()/*: string */;
 
-    public function getRequiredAuthenticationFactors()/*: array<factor>*/;
-
-    public function getAuthFactorNotValidBeforeTime()/*: ?\DateTime*/;
+    public function getRequiredAuthenticationFactors()/*: array<Factors\FactorType>*/;
 
     public function validateInherenceFactor(OE $factor)/*: bool*/;
 
