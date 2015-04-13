@@ -11,6 +11,8 @@ use DateTime;
  */
 class FactorTest extends \PHPUnit_Framework_TestCase {
 
+    use OpaqueEnvelopeTrait;
+
     /**
      * @covers ::__construct
      */
@@ -59,10 +61,6 @@ class FactorTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($factor, $factor->setExpiration($exp),
             'setExpiration did not return $this');
     } // testSetExpirationIsChainable
-
-    private function getEnvelope($secret = '') {
-        return new \Firehed\Common\OpaqueEnvelope($secret);
-    } // getEnvelope
 
 }
 
