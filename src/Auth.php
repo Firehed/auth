@@ -90,6 +90,13 @@ class Auth {
     public function setUser(Authable $user)/*: this*/ {
         $this->user = $user;
         $this->uid = $user->getID();
+        $this->ifct = null;
+        $this->ifet = null;
+        $this->kfct = null;
+        $this->kfet = null;
+        $this->pfct = null;
+        $this->pfet = null;
+        $this->hst = null;
         return $this;
     } // setUser
 

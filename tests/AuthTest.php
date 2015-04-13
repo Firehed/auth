@@ -153,6 +153,28 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
             ->getUser();
     } // testGetUserThatWasSetFailsWithoutFactors
 
+
+    /**
+     * @covers ::setUser
+     * @covers ::getUser
+     * @expectedException Firehed\Auth\Exceptions\AuthenticationRequiredException
+     */
+    public function testSetUserWipesExistingAuth() {
+        $a = new Auth();
+        $u = $this->getUser(['k' => true])->reveal();
+        $kf = $this->getFactor(Type::KNOWLEDGE())->reveal();
+        try {
+            $a->setUser($u)
+                ->validateFactor($kf)
+                ->getUser();
+        } catch (Exceptions\AuthException $e) {
+            $this->fail('Sanity check failed; initial auth should have worked');
+        }
+        $new_user = $this->getUser(['k' => true])->reveal();
+        $a->setUser($new_user)
+            ->getUser();
+    } // testSetUserWipesExistingAuth
+
     ///////////////////////////////////
 
     /**
