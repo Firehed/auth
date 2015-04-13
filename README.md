@@ -104,9 +104,9 @@ Included are examples of various scenarios. Note that in all `POST` handling,
 necessary tasks such as CSRF protection are not covered.
 
 ### Checking Validity
-* ~ `home_anon.php`: Example page not requiring any authenticated user~
-* ~ `home_user.php`: Example page requiring a normally-authenticated user~
-* ~ `change_pass.php`: Example high-security page~
+* ~~ `home_anon.php`: Example page not requiring any authenticated user~~
+* ~~ `home_user.php`: Example page requiring a normally-authenticated user~~
+* ~~ `change_pass.php`: Example high-security page~~
 
 ### Login and logout pages
 * `login.php`: How to use a typical username/password login
@@ -115,9 +115,9 @@ necessary tasks such as CSRF protection are not covered.
 * `login_combined.php`: Put the two factors on the same page (this would only
   be practical if MFA is required for all users)
 * `logout.php`: How to log out a user
-* ~`logout_all.php`: ~
-* ~`forget.php`: In an environment supporting MFA, forget the saved trust in the
-  device (require re-confirming the device in the next session) ~
+* ~~`logout_all.php`: ~~
+* ~~`forget.php`: In an environment supporting MFA, forget the saved trust in the
+  device (require re-confirming the device in the next session) ~~
 
 [^db]: Of course, you will still need to securely store password hashes, OTP
 shared secrets, etc. What you will not need to do is muck around with existing
