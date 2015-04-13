@@ -19,11 +19,11 @@ use Firehed\JWT;
 
 $auth = new Auth\Auth();
 $user = $auth->setRequiredLevel(Auth\Level::LOGIN())
-  ->setLoader(function($uid) { return (new User())->find($uid); })
-  ->setToken(JWT\JWT::decode($_COOKIE['auth'],
-                             JWT\Algorithm::HMAC_SHA_256(),
-                             'jwt_signing_key'))
-  ->getUser();
+    ->setLoader(function($uid) { return (new User())->find($uid); })
+    ->setToken(JWT\JWT::decode($_COOKIE['auth'],
+                               JWT\Algorithm::HMAC_SHA_256(),
+                               'jwt_signing_key'))
+    ->getUser();
 ```
 
 ## Installation
@@ -49,6 +49,11 @@ during the start of a login flow.
 Provide a callback that will return a Firehed\Auth\Authable object provided
 a unique identifier. This will be used alongside `setToken` to allow `getUser`
 to function on restored sessions.
+
+It must have the following signature:
+```php
+function(string $uid): Firehed\Auth\Authable
+```
 
 ### setRequiredLevel(Firehed\Auth\Level $level): $this
 Provide the authentication level required for `getUser` to return a user. This
