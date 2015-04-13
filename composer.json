@@ -1,0 +1,25 @@
+{
+    "name": "firehed/auth",
+    "description": "Authentication toolset",
+    "require-dev": {
+        "firehed/arctools": "*@dev",
+        "phpunit/phpunit": "~4.6"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eric Stern",
+            "email": "eric@ericstern.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Firehed\\Auth\\": ["src/", "tests/"]
+        }
+    },
+    "require": {
+        "firehed/common": "*@dev",
+        "firehed/jwt": "*@dev"
+    },
+    "minimum-stability": "dev"
+}
