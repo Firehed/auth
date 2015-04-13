@@ -9,8 +9,6 @@ interface Authable {
 
     public function getID()/*: string */;
 
-    public function getSupportedAuthenticationFactors()/*: array<factor>*/;
-
     public function getRequiredAuthenticationFactors()/*: array<factor>*/;
 
     public function getAuthFactorNotValidBeforeTime()/*: ?\DateTime*/;
