@@ -56,7 +56,7 @@ function getJWT() {
 }
 function sendAuthToken(JWT\JWT $jwt) {
     $your_application_secret = 'XXXXXXXX';
-    $token_string = $jwt->setAlgorithm(JWT\Algorithm::HMAC_SHA_256()
+    $token_string = $jwt->setAlgorithm(JWT\Algorithm::HMAC_SHA_256())
         ->encode($your_application_secret);
     setcookie('auth',
         $token_string,
