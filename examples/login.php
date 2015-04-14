@@ -39,8 +39,6 @@ else {
         <input type="email" name="email"></label><br>
     <label>Password:
         <input type="password" name="password"></label><br>
-    <label>Generated code:
-        <input type="text" name="otp" placeholder="00000000"></label><br>
     <label>Remember me?
         <input type="checkbox" name="remember" value="1"></label><br>
     <input type="submit">
