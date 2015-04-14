@@ -2,7 +2,7 @@
     "name": "firehed/auth",
     "description": "Authentication toolset",
     "require-dev": {
-        "firehed/arctools": "*@dev",
+        "firehed/arctools": "1.*",
         "phpunit/phpunit": "~4.6"
     },
     "license": "MIT",
@@ -18,8 +18,10 @@
         }
     },
     "require": {
-        "firehed/common": "*@dev",
-        "firehed/jwt": "*@dev"
+        "firehed/common": "1.*",
+        "firehed/jwt": "1.*"
     },
-    "minimum-stability": "dev"
+    "suggest": {
+        "firehed/security": "Provides a TOTP helper for adding a possession factor"
+    }
 }
