@@ -9,7 +9,7 @@ namespace Firehed\Auth\Factors;
  */
 class PossessionFactorTest extends \PHPUnit_Framework_TestCase {
 
-    use OpaqueEnvelopeTrait;
+    use SecretTrait;
 
     /**
      * @covers ::getType

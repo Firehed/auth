@@ -3,7 +3,7 @@
 namespace Firehed\Auth\Factors;
 
 use DateTime;
-use Firehed\Common\OpaqueEnvelope;
+use Firehed\Security\Secret;
 
 abstract class Factor {
 
@@ -11,7 +11,7 @@ abstract class Factor {
 
     abstract public function getType()/*: FactorType*/;
 
-    public function __construct(OpaqueEnvelope $secret) {
+    public function __construct(Secret $secret) {
         $this->secret = $secret;
     } // __construct
 

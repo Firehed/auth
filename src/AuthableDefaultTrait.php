@@ -2,7 +2,7 @@
 
 namespace Firehed\Auth;
 
-use Firehed\Common\OpaqueEnvelope as OE;
+use Firehed\Security\Secret;
 use InvalidMethodCallException;
 
 trait AuthableDefaultTrait {
@@ -30,7 +30,7 @@ trait AuthableDefaultTrait {
      * without having to write no-op methods for unsupported factors (your
      * application probably does not support biometrics, for example)
      */
-    public function validateInherenceFactor(OE $envelope) {
+    public function validateInherenceFactor(Secret $envelope) {
         // There don't appear to be any common standards for biometric
         // authentication, but should one emerge, this would probably be
         // implemented by using `hash_equals` to compare a known hash against
@@ -40,7 +40,7 @@ trait AuthableDefaultTrait {
             'Override this method to support them.');
     } // validateInherenceFactor
 
-    public function validateKnowledgeFactor(OE $envelope) {
+    public function validateKnowledgeFactor(Secret $envelope) {
         // Your implementation will likely look something like this:
         // return \password_verify($envelope->open(), $this->getHashFromDB());
         throw new InvalidMethodCallException(
@@ -48,7 +48,7 @@ trait AuthableDefaultTrait {
             'Override this method to support them.');
     } // validateKnowledgeFactor
 
-    public function validatePossessionFactor(OE $envelope) {
+    public function validatePossessionFactor(Secret $envelope) {
         // Your implemenation may look as follows if you use the
         // firehed/security package (https://github.com/Firehed/Security)
         //

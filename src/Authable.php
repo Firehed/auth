@@ -2,7 +2,7 @@
 
 namespace Firehed\Auth;
 
-use Firehed\Common\OpaqueEnvelope as OE;
+use Firehed\Security\Secret;
 
 interface Authable {
 
@@ -12,10 +12,10 @@ interface Authable {
 
     public function getRequiredAuthenticationFactors()/*: array<Factors\FactorType>*/;
 
-    public function validateInherenceFactor(OE $factor)/*: bool*/;
+    public function validateInherenceFactor(Secret $factor)/*: bool*/;
 
-    public function validateKnowledgeFactor(OE $factor)/*: bool*/;
+    public function validateKnowledgeFactor(Secret $factor)/*: bool*/;
 
-    public function validatePossessionFactor(OE $factor)/*: bool*/;
+    public function validatePossessionFactor(Secret $factor)/*: bool*/;
 
 }

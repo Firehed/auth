@@ -5,7 +5,7 @@ namespace Firehed\Auth;
 use DateTime;
 use DateInterval;
 
-use Firehed\Common\OpaqueEnvelope;
+use Firehed\Security\Secret;
 use Firehed\JWT\JWT;
 use Prophecy\Argument;
 use Prophecy\Prophecy\MethodProphecy;
@@ -502,7 +502,7 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
             'i' => false,
             'p' => false,
         ];
-        $type = Argument::type('Firehed\Common\OpaqueEnvelope');
+        $type = Argument::type('Firehed\Security\Secret');
         $user = $this->prophesize('Firehed\Auth\Authable');
         $user->validateInherenceFactor($type)
             ->willReturn($values['i']);
@@ -538,7 +538,7 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
         $factor = $this->prophesize('Firehed\Auth\Factors\\'.$name);
         $factor->getType()->willReturn($type);
         $factor->getExpiration()->willReturn($exp);
-        $factor->getSecret()->willReturn(new OpaqueEnvelope(''));
+        $factor->getSecret()->willReturn(new Secret(''));
         return $factor;
     } // getFactor
 

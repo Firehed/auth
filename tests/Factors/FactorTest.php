@@ -11,7 +11,7 @@ use DateTime;
  */
 class FactorTest extends \PHPUnit_Framework_TestCase {
 
-    use OpaqueEnvelopeTrait;
+    use SecretTrait;
 
     /**
      * @covers ::__construct

@@ -2,10 +2,10 @@
 
 namespace Firehed\Auth\Factors;
 
-trait OpaqueEnvelopeTrait {
+trait SecretTrait {
 
     private function getEnvelope($secret = '') {
-        return new \Firehed\Common\OpaqueEnvelope($secret);
+        return new \Firehed\Security\Secret($secret);
     } // getEnvelope
 
 }
