@@ -3,7 +3,7 @@
 namespace Firehed\Auth;
 
 use Firehed\Security\Secret;
-use InvalidMethodCallException;
+use BadMethodCallException;
 
 trait AuthableDefaultTrait {
 
@@ -35,7 +35,7 @@ trait AuthableDefaultTrait {
         // authentication, but should one emerge, this would probably be
         // implemented by using `hash_equals` to compare a known hash against
         // one provided from a device output
-        throw new InvalidMethodCallException(
+        throw new BadMethodCallException(
             'The default implementation does not support inherence factors. '.
             'Override this method to support them.');
     } // validateInherenceFactor
@@ -43,7 +43,7 @@ trait AuthableDefaultTrait {
     public function validateKnowledgeFactor(Secret $envelope) {
         // Your implementation will likely look something like this:
         // return \password_verify($envelope->open(), $this->getHashFromDB());
-        throw new InvalidMethodCallException(
+        throw new BadMethodCallException(
             'The default implementation does not support knowledge factors. '.
             'Override this method to support them.');
     } // validateKnowledgeFactor
@@ -57,7 +57,7 @@ trait AuthableDefaultTrait {
         //             // hashing algos, but Google Authenticator only supports
         //             // 6-digit SHA-1 outputs.
         // return \hash_equals(OTP::TOTP($key, $opts), $envelope->open());
-        throw new InvalidMethodCallException(
+        throw new BadMethodCallException(
             'The default implementation does not support possession factors. '.
             'Override this method to support them.');
     } // validatePossessionFactor
