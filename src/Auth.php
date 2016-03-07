@@ -10,9 +10,12 @@ use Firehed\JWT\JWT;
 use BadMethodCallException;
 
 class Auth {
+    const RET_OK = 0;
+    const RET_EXP = 1;
+    const RET_UNAUTH = 2;
 
     // userid
-    private $uid;
+    private $uid = '';
     // Factor timestamps (factor create time, factor expire time)
     private $kfct, $kfet;
     private $pfct, $pfet;
@@ -23,6 +26,9 @@ class Auth {
     private $loader;
 
     private $required_level;
+
+    private $required_factors = [];
+    private $nvbt; // not valid before time
 
     private $time;
 
@@ -46,12 +52,19 @@ class Auth {
         return new JWT($this->getDataForJWT());
     } // getToken
 
-    public function getUser()/*: Authable */ {
+    public function getUser()/*: ?Authable */ {
         if ($this->required_level->is(Level::ANONYMOUS)) {
             return;
         }
         $this->loadUser();
-        $this->enforceValidations();
+        if (!$this->user) {
+            throw new AE\UserNotFoundException();
+        }
+        if ($this->required_level->is(Level::PARTIAL)) {
+            return null;
+        }
+        $this->assertFactorTimestamps()
+            ->assertHighSecurity();
         return $this->user;
     } // getUser
 
@@ -89,14 +102,10 @@ class Auth {
 
     public function setUser(Authable $user)/*: this*/ {
         $this->user = $user;
+        $this->required_factors = $user->getRequiredAuthenticationFactors();
+        $this->nvbt = $user->getAuthFactorNotValidBeforeTime();
         $this->uid = $user->getID();
-        $this->ifct = null;
-        $this->ifet = null;
-        $this->kfct = null;
-        $this->kfet = null;
-        $this->pfct = null;
-        $this->pfet = null;
-        $this->hst = null;
+        $this->expireAllFactors();
         return $this;
     } // setUser
 
@@ -121,6 +130,11 @@ class Auth {
         $ct = clone $this->time;
         $et = $factor->getExpiration();
         $this->loadUser();
+        if (!$this->user) {
+            throw new BadMethodCallException(
+                'Trying to validate a factor with no user to validate aagainst. '.
+                'Provide a user with setUser() or setToken() first');
+        }
 
         switch ($factor->getType()->getValue()) {
         case FactorType::INHERENCE:
@@ -150,6 +164,35 @@ class Auth {
         }
     } // validateFactor
 
+
+    public function isMissingUser() {
+        $this->loadUser();
+        return $this->user === null;
+    }
+
+    public function isMissingKnowledgeFactor() {
+        return $this->isMissingFactor(FactorType::KNOWLEDGE(),
+            $this->kfct,
+            $this->kfet);
+    }
+    public function isMissingPossessionFactor() {
+        return $this->isMissingFactor(FactorType::POSSESSION(),
+            $this->pfct,
+            $this->pfet);
+    }
+    public function isMissingInherenceFactor() {
+        return $this->isMissingFactor(FactorType::INHERENCE(),
+            $this->ifct,
+            $this->ifet);
+    }
+
+    private function isMissingFactor(
+        FactorType $type,
+        DateTime $create = null,
+        DateTime $expire = null
+    ) {
+        return $this->validateType($type, $create, $expire) !== self::RET_OK;
+    }
     // -( Logout )-------------------------------------------------------------
 
     public function expireFactor(FactorType $factor)/*: this*/ {
@@ -166,14 +209,29 @@ class Auth {
             $this->pfct = null;
             $this->pfet = null;
             break;
-
         }
         return $this;
     } // expireFactor
 
+    public function expireAllFactors() {
+        $this->ifct = null;
+        $this->ifet = null;
+        $this->kfct = null;
+        $this->kfet = null;
+        $this->pfct = null;
+        $this->pfet = null;
+        $this->hst = null;
+        return $this;
+    }
+
+    public function destroy() {
+        $this->user = null;
+        $this->uid = '';
+        $this->expireAllFactors();
+        return $this;
+    }
 
     // -( Internals )----------------------------------------------------------
-
 
     // -( Internals:Accessors )------------------------------------------------
 
@@ -193,84 +251,85 @@ class Auth {
         ];
     } // getDataForJWT
 
-    private function getUID()/*: string*/ {
-        return $this->uid;
-    }
-
     // -( Internals:Validation )-----------------------------------------------
 
-    private function enforceValidations()/*: void*/ {
-        $this->validateFactorTimes()
-            ->validateAuthLevel();
-    } // enforceValidations
-
-    private function validateFactorTimes()/*: this*/ {
-        $not_valid_before_timestamp =
-            $this->loadUser()->getAuthFactorNotValidBeforeTime();
-        $required_factors =
-            $this->loadUser()->getRequiredAuthenticationFactors();
-        $factor_timestamps = [];
-        foreach ($required_factors as $factor) {
-            switch ($factor->getValue()) {
-            case FactorType::INHERENCE:
-                $factor_timestamps[] = [$this->ifct, $this->ifet];
+    private function assertFactorTimestamps()/*: this*/ {
+        $data = [
+            [FactorType::KNOWLEDGE(),  $this->kfct, $this->kfet],
+            [FactorType::POSSESSION(), $this->pfct, $this->pfet],
+            [FactorType::INHERENCE(),  $this->ifct, $this->ifet],
+        ];
+        foreach ($data as $types) {
+            list($type, $create, $exp) = $types;
+            $validation = $this->validateType($type, $create, $exp);
+            switch ($validation) {
+            case self::RET_OK:
                 break;
-            case FactorType::KNOWLEDGE:
-                $factor_timestamps[] = [$this->kfct, $this->kfet];
-                break;
-            case FactorType::POSSESSION:
-                $factor_timestamps[] = [$this->pfct, $this->pfet];
-                break;
-            }
-        }
-        // Convert $required_factors into the timestamp values
-        // Throw an an AuthenticationRequiredException if the create time is
-        // absent
-        foreach ($factor_timestamps as $factor_timestamp) {
-            list($create, $expire) = $factor_timestamp;
-            if (null === $create) {
+            case self::RET_UNAUTH:
                 throw new AE\AuthenticationRequiredException([]);
-            }
-            // Fail if it was created before the minimum
-            if ($not_valid_before_timestamp
-                && $create < $not_valid_before_timestamp) {
-                throw new AE\FactorExpiredException([]);
-            }
-            if (null === $expire) {
-                continue;
-            }
-            // Fail if we are after the expiration time
-            if (new DateTime() > $expire) {
+            case self::RET_EXP:
                 throw new AE\FactorExpiredException([]);
             }
         }
         return $this;
-    } // validateFactorTimes
+    } // assertFactorTimestamps
 
-    private function validateAuthLevel()/*: this*/ {
-        switch ($this->required_level->getValue()) {
-        case Level::ANONYMOUS:
-            //
-            break;
-        case Level::LOGIN:
-            break;
-        case Level::HISEC:
+    private function assertHighSecurity() {
+        if ($this->required_level->is(Level::HISEC)) {
             if (!$this->hst || $this->hst < $this->time) {
                 throw new AE\HighSecurityAuthenticationRequiredException([]);
             }
         }
         return $this;
-    } // validateAuthLevel
+    }
+
+    private function validateType(
+        FactorType $type,
+        DateTime $create = null,
+        DateTime $expire = null
+    ) {
+        $this->loadUser();
+        if ($this->required_level->is(Level::ANONYMOUS)) {
+            return self::RET_OK;
+        }
+        if (!in_array($type, $this->required_factors)) {
+            return self::RET_OK;
+        }
+        if ($create === null) {
+            return self::RET_UNAUTH;
+        }
+        if ($this->nvbt && $create < $this->nvbt) {
+            return self::RET_EXP;
+        }
+        if ($expire === null) {
+            // Does not expire
+            return self::RET_OK;
+        }
+        if ($expire > $this->time) {
+            // Expires in future
+            return self::RET_OK;
+        }
+        return self::RET_EXP;
+    }
+
 
     // -( Internals:Misc )-----------------------------------------------------
 
     private function loadUser() {
+        if ($this->required_level->is(Level::ANONYMOUS)) {
+            return;
+        }
         if (!$this->user) {
+            if (!$this->uid) {
+                return null;
+            }
             if (!$this->loader) {
                 throw new BadMethodCallException(
                     'Provide a loader before calling getUser');
             }
-            $this->user = (call_user_func($this->loader, $this->getUID()));
+            $this->user = ($this->loader)($this->uid);
+            $this->required_factors = $this->user->getRequiredAuthenticationFactors();
+            $this->nvbt = $this->user->getAuthFactorNotValidBeforeTime();
         }
         return $this->user;
     } // loadUser

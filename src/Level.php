@@ -7,7 +7,8 @@ use Firehed\Common\Enum;
 class Level extends Enum {
 
     const ANONYMOUS = 0;
-    const LOGIN = 1;
-    const HISEC = 2;
+    const PARTIAL = 1;
+    const LOGIN = 2;
+    const HISEC = 3;
 
 }

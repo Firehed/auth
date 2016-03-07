@@ -2,6 +2,7 @@
 
 namespace Firehed\Auth;
 
+use BadMethodCallException;
 use DateTime;
 use DateInterval;
 
@@ -38,6 +39,12 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($a, $a->validateFactor($f),
             'validateFactor did not return $this');
     } // testValidateFactor
+
+    public function testGetUserWithNoData() {
+        $a = new Auth();
+        $this->expectException(Exceptions\UserNotFoundException::class);
+        $a->getUser();
+    }
 
     /**
      * @covers ::validateFactor
@@ -126,7 +133,7 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
             'pfet' => null,
             'hst' => null,
         ];
-        $user = $this->getUser();
+        $user = $this->getUser()->reveal();
         $tok = new JWT($claims);
         $a = new Auth();
         $this->assertSame($user,
@@ -153,6 +160,44 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
             ->getUser();
     } // testGetUserThatWasSetFailsWithoutFactors
 
+    /**
+     * @covers ::getUser
+     * @covers ::isMissingUser
+     */
+    public function testGetUserThrowsWhenInPartialMode() {
+        $a = new Auth();
+        $a->setLoader(function() {})
+            ->setRequiredLevel(Level::PARTIAL());
+        try {
+            $a->getUser();
+            $this->fail('Expected exception not thrown');
+        } catch (Exceptions\UserNotFoundException $e) {
+            $this->assertTrue($a->isMissingUser());
+        }
+    }
+
+    /**
+     * @covers ::getUser
+     */
+    public function testGetUserDoesNotThrowWhenUnauthUserIsPresentInPartialMode() {
+        $a = new Auth();
+        $a->setUser($this->getUser(['k' => true])->reveal());
+        $a->setRequiredLevel(Level::PARTIAL());
+        $this->assertNull($a->getUser());
+
+    }
+
+    /**
+     * @dataProvider factors
+     * @covers ::validateFactor
+     */
+    public function testValidateFactorThrowsWithNoUser(Factors\Factor $factor) {
+        $a = new Auth();
+        $a->setLoader(function() {})
+            ->setRequiredLevel(Level::PARTIAL());
+        $this->expectException(BadMethodCallException::class);
+        $a->validateFactor($factor);
+    }
 
     /**
      * @covers ::setUser
@@ -289,7 +334,7 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
         ];
         $tok = new JWT($claims);
 
-        $user = $this->getUser();
+        $user = $this->getUser()->reveal();
 
         $a = new Auth();
         $this->assertSame($user,
