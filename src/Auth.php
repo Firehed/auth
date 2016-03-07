@@ -140,28 +140,34 @@ class Auth {
         case FactorType::INHERENCE:
             $success = $this->user
                 ->validateInherenceFactor($factor->getSecret());
-            $this->ifct = $ct;
-            $this->ifet = $et;
             break;
         case FactorType::KNOWLEDGE:
             $success = $this->user
                 ->validateKnowledgeFactor($factor->getSecret());
-            $this->kfct = $ct;
-            $this->kfet = $et;
             break;
         case FactorType::POSSESSION:
             $success = $this->user
                 ->validatePossessionFactor($factor->getSecret());
+            break;
+        }
+        if (!$success) {
+            throw new Exceptions\AuthenticationFailedException();
+        }
+        switch ($factor->getType()->getValue()) {
+        case FactorType::INHERENCE:
+            $this->ifct = $ct;
+            $this->ifet = $et;
+            break;
+        case FactorType::KNOWLEDGE:
+            $this->kfct = $ct;
+            $this->kfet = $et;
+            break;
+        case FactorType::POSSESSION:
             $this->pfct = $ct;
             $this->pfet = $et;
             break;
         }
-        if ($success) {
-            return $this;
-        }
-        else {
-            throw new Exceptions\AuthenticationFailedException();
-        }
+        return $this;
     } // validateFactor
 
 

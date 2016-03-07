@@ -517,6 +517,36 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
         $a->getUser();
     }
 
+    /**
+     * @dataProvider factors
+     */
+    public function testValidityNeverLeaksThrough(Factors\Factor $factor) {
+        $a = new Auth();
+        $user = $this->getUser(); // fail validation
+        $user->getRequiredAuthenticationFactors()
+            ->willReturn([Type::KNOWLEDGE(),
+                Type::POSSESSION(),
+                Type::INHERENCE()]);
+
+        $a->setUser($user->reveal());
+
+        $this->assertTrue($a->isMissingKnowledgeFactor());
+        $this->assertTrue($a->isMissingPossessionFactor());
+        $this->assertTrue($a->isMissingInherenceFactor());
+
+        try {
+            $a->validateFactor($factor);
+            $this->fail("Factor should have failed validation");
+        } catch (Exceptions\AuthException $e) {}
+        $this->assertTrue($a->isMissingKnowledgeFactor(),
+            'Knowledge factor leaked');
+        $this->assertTrue($a->isMissingPossessionFactor(),
+            'Possession factor leaked');
+        $this->assertTrue($a->isMissingInherenceFactor(),
+            'Inherence factor leaked');
+
+    }
+
     // -( DataProviders )------------------------------------------------------
 
     public function factors() {
