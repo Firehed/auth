@@ -47,6 +47,56 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers ::isMissingKnowledgeFactor
+     * @covers ::isMissingPossessionFactor
+     * @covers ::isMissingInherenceFactor
+     */
+    public function testMissingChecks() {
+        $a = new Auth();
+        $user = $this->getUser(['k' => true,
+                                'i' => true,
+                                'p' => true]);
+        $user->getRequiredAuthenticationFactors()
+            ->willReturn([
+                Type::KNOWLEDGE(),
+                Type::POSSESSION(),
+                Type::INHERENCE()]);
+
+        $a->setUser($user->reveal());
+        $this->assertTrue($a->isMissingKnowledgeFactor(),
+            'Should be missing knowledge factor');
+        $this->assertTrue($a->isMissingPossessionFactor(),
+            'Should be missing possession factor');
+        $this->assertTrue($a->isMissingInherenceFactor(),
+            'Should be missing inherence factor');
+
+        $a->validateFactor($this->getFactor(Type::KNOWLEDGE())->reveal());
+        $this->assertFalse($a->isMissingKnowledgeFactor(),
+            'Should not be missing knowledge factor');
+        $this->assertTrue($a->isMissingPossessionFactor(),
+            'Should be missing possession factor');
+        $this->assertTrue($a->isMissingInherenceFactor(),
+            'Should be missing inherence factor');
+
+        $a->validateFactor($this->getFactor(Type::POSSESSION())->reveal());
+        $this->assertFalse($a->isMissingKnowledgeFactor(),
+            'Should not be missing knowledge factor');
+        $this->assertFalse($a->isMissingPossessionFactor(),
+            'Should not be missing possession factor');
+        $this->assertTrue($a->isMissingInherenceFactor(),
+            'Should be missing inherence factor');
+
+        $a->validateFactor($this->getFactor(Type::INHERENCE())->reveal());
+        $this->assertFalse($a->isMissingKnowledgeFactor(),
+            'Should not be missing knowledge factor');
+        $this->assertFalse($a->isMissingPossessionFactor(),
+            'Should not be missing possession factor');
+        $this->assertFalse($a->isMissingInherenceFactor(),
+            'Should not be missing inherence factor');
+
+    }
+
+    /**
      * @covers ::validateFactor
      * @dataProvider factors
      * @expectedException Firehed\Auth\Exceptions\AuthenticationFailedException
