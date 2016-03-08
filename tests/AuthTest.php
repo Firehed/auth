@@ -559,7 +559,7 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
             $a->validateFactor($kf->reveal())
             ->validateFactor($pf->reveal());
         }
-        catch (AuthException $e) {
+        catch (Exceptions\AuthException $e) {
             $this->fail('No exception should have been thrown while '.
                 'validating the knowledge factor');
         }
