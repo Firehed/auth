@@ -333,7 +333,7 @@ class Auth {
         if ($create === null) {
             return self::RET_UNAUTH;
         }
-        if ($this->nvbt && $create < $this->nvbt) {
+        if ($create < $this->nvbt) {
             return self::RET_EXP;
         }
         if ($expire === null) {

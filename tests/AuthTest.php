@@ -650,7 +650,7 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
         $user->getID()
             ->willReturn('user_id');
         $user->getAuthFactorNotValidBeforeTime()
-            ->willReturn(null);
+            ->willReturn(new DateTime('@0')); // Unixtime 0
         // Default user behavior is password-only
         $user->getRequiredAuthenticationFactors()
             ->willReturn([Type::KNOWLEDGE()]);

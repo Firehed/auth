@@ -2,6 +2,7 @@
 
 namespace Firehed\Auth;
 
+use DateTime;
 use BadMethodCallException;
 use Firehed\Security\Secret;
 
@@ -9,10 +10,18 @@ trait AuthableDefaultTrait {
 
     /**
      * By default, assume no factors are expired. Override this and return
-     * a DateTime to trigger an expiration
+     * a recent DateTime to trigger an expiration. For example, the following
+     * will force refreshing a factor older than one month old:
+     *
+     *     return (new DateTime())->sub(new DateInterval('P1M'));
+     *
+     * @return DateTime
      */
-    public function getAuthFactorNotValidBeforeTime()/*: ?DateTime*/ {
-        return null;
+    public function getAuthFactorNotValidBeforeTime(): DateTime {
+        // Returns unixtime zero (1970-01-01). There is no magical behavior
+        // about it, but it's sufficiently far in the past that there is no
+        // risk of a recently-validated factor being caught by mistake.
+        return new DateTime('@0');
     } // getAuthFactorNotValidBeforeTime
 
     /**
