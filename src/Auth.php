@@ -85,13 +85,13 @@ class Auth {
 
     // -( Setters )------------------------------------------------------------
 
-    public function setLoader(callable $loader)/*: this*/ {
+    public function setLoader(callable $loader): self {
         // loader signature: function(string $uid): Authable
         $this->loader = $loader;
         return $this;
     } // setLoader
 
-    public function setRequiredLevel(Level $level)/*: this*/ {
+    public function setRequiredLevel(Level $level): self {
         $this->required_level = $level;
         return $this;
     } // setRequiredLevel
@@ -105,7 +105,7 @@ class Auth {
         return $this;
     }
 
-    private function setToken(JWT $jwt)/*: this*/ {
+    private function setToken(JWT $jwt): self {
         $claims = $jwt->getClaims();
         $this->uid = $claims['uid'];
         // Override any previously-set user to re-perform validation
@@ -124,7 +124,7 @@ class Auth {
         return $this;
     } // setToken
 
-    public function setUser(Authable $user)/*: this*/ {
+    public function setUser(Authable $user): self {
         $this->user = $user;
         $this->required_factors = $user->getRequiredAuthenticationFactors();
         $this->nvbt = $user->getAuthFactorNotValidBeforeTime();
@@ -133,14 +133,14 @@ class Auth {
         return $this;
     } // setUser
 
-    public function setKeys(KeyContainer $keys)/*: this*/ {
+    public function setKeys(KeyContainer $keys): self {
         $this->keys = $keys;
         return $this;
     }
 
     // -( High-security mode )-------------------------------------------------
 
-    public function enterHighSecurity(Factor $factor)/*: this*/ {
+    public function enterHighSecurity(Factor $factor): self {
         $this->validateFactor($factor);
         // ensure that a null time still works for the rest of the request,
         // enabling password change and similar stuff
@@ -154,7 +154,7 @@ class Auth {
 
     // -( Authentication )-----------------------------------------------------
 
-    public function validateFactor(Factor $factor)/*: this*/ {
+    public function validateFactor(Factor $factor): self {
         $success = false;
         $ct = clone $this->time;
         $et = $factor->getExpiration();
@@ -230,7 +230,7 @@ class Auth {
     }
     // -( Logout )-------------------------------------------------------------
 
-    public function expireFactor(FactorType $factor)/*: this*/ {
+    public function expireFactor(FactorType $factor): self {
         switch ($factor->getValue()) {
         case FactorType::INHERENCE:
             $this->ifct = null;
@@ -288,7 +288,7 @@ class Auth {
 
     // -( Internals:Validation )-----------------------------------------------
 
-    private function assertFactorTimestamps()/*: this*/ {
+    private function assertFactorTimestamps(): self {
         $data = [
             [FactorType::KNOWLEDGE(),  $this->kfct, $this->kfet],
             [FactorType::POSSESSION(), $this->pfct, $this->pfet],
