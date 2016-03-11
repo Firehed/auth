@@ -2,8 +2,8 @@
 
 namespace Firehed\Auth;
 
-use DateTime;
 use BadMethodCallException;
+use DateTime;
 use Firehed\Security\Secret;
 
 trait AuthableDefaultTrait {
