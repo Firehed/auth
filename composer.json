@@ -20,6 +20,7 @@
     "require": {
         "firehed/common": "^1.0",
         "firehed/jwt": "^2.0",
-        "firehed/security": "^1.0"
+        "firehed/security": "^1.0",
+        "php": ">=7"
     }
 }
