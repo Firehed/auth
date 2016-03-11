@@ -2,8 +2,8 @@
 
 namespace Firehed\Auth;
 
-use Firehed\Security\Secret;
 use BadMethodCallException;
+use Firehed\Security\Secret;
 
 trait AuthableDefaultTrait {
 
@@ -20,7 +20,7 @@ trait AuthableDefaultTrait {
      * supported. Override this to support MFA.
      * @return array<Factors\FactorType>
      */
-    public function getRequiredAuthenticationFactors()/*: array*/ {
+    public function getRequiredAuthenticationFactors(): array {
         return [Factors\FactorType::KNOWLEDGE()];
     } // getRequiredAuthenticationFactors
 
@@ -29,8 +29,10 @@ trait AuthableDefaultTrait {
      * use them. This is done strictly to implement the Authable interface
      * without having to write no-op methods for unsupported factors (your
      * application probably does not support biometrics, for example)
+     *
+     * @return bool
      */
-    public function validateInherenceFactor(Secret $envelope) {
+    public function validateInherenceFactor(Secret $secret): bool {
         // There don't appear to be any common standards for biometric
         // authentication, but should one emerge, this would probably be
         // implemented by using `hash_equals` to compare a known hash against
@@ -40,15 +42,15 @@ trait AuthableDefaultTrait {
             'Override this method to support them.');
     } // validateInherenceFactor
 
-    public function validateKnowledgeFactor(Secret $envelope) {
+    public function validateKnowledgeFactor(Secret $secret): bool {
         // Your implementation will likely look something like this:
-        // return \password_verify($envelope->open(), $this->getHashFromDB());
+        // return \password_verify($secret->reveal(), $this->getHashFromDB());
         throw new BadMethodCallException(
             'The default implementation does not support knowledge factors. '.
             'Override this method to support them.');
     } // validateKnowledgeFactor
 
-    public function validatePossessionFactor(Secret $envelope) {
+    public function validatePossessionFactor(Secret $secret): bool {
         // Your implemenation may look as follows if you use the
         // firehed/security package (https://github.com/Firehed/Security)
         //
@@ -56,7 +58,7 @@ trait AuthableDefaultTrait {
         // $opts = []; // Configurable to have a longer output and better
         //             // hashing algos, but Google Authenticator only supports
         //             // 6-digit SHA-1 outputs.
-        // return \hash_equals(OTP::TOTP($key, $opts), $envelope->open());
+        // return \hash_equals(TOTP($key, $opts), $secret->reveal());
         throw new BadMethodCallException(
             'The default implementation does not support possession factors. '.
             'Override this method to support them.');

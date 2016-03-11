@@ -14,14 +14,14 @@ interface Authable {
     // will be invalidated.
     public function getAuthFactorNotValidBeforeTime()/*: ?\DateTime*/;
 
-    public function getID()/*: string */;
+    public function getID()/*: mixed */;
 
-    public function getRequiredAuthenticationFactors()/*: array<Factors\FactorType>*/;
+    public function getRequiredAuthenticationFactors(): array/*<Factors\FactorType>*/;
 
-    public function validateInherenceFactor(Secret $factor)/*: bool*/;
+    public function validateInherenceFactor(Secret $secret): bool;
 
-    public function validateKnowledgeFactor(Secret $factor)/*: bool*/;
+    public function validateKnowledgeFactor(Secret $secret): bool;
 
-    public function validatePossessionFactor(Secret $factor)/*: bool*/;
+    public function validatePossessionFactor(Secret $secret): bool;
 
 }
