@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b45b103f5e2aaf66e9b291986012f1f0",
-    "content-hash": "f29fc12b8c97ed4cffb8c253e755c76f",
+    "hash": "cb7ff7213883fc3086164514a6076f0b",
+    "content-hash": "9ff092ab0103f66e0ac8936ab569d650",
     "packages": [
         {
             "name": "firehed/arctools",
@@ -130,16 +130,16 @@
         },
         {
             "name": "firehed/security",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Firehed/Security.git",
-                "reference": "cb4add11539749a2b7b0da5fa0559a5ec1dc66ba"
+                "reference": "5500c97483a9ac2ef060cd09c836c954c6a834d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Firehed/Security/zipball/cb4add11539749a2b7b0da5fa0559a5ec1dc66ba",
-                "reference": "cb4add11539749a2b7b0da5fa0559a5ec1dc66ba",
+                "url": "https://api.github.com/repos/Firehed/Security/zipball/5500c97483a9ac2ef060cd09c836c954c6a834d3",
+                "reference": "5500c97483a9ac2ef060cd09c836c954c6a834d3",
                 "shasum": ""
             },
             "require": {
@@ -173,7 +173,7 @@
                 }
             ],
             "description": "Security tools for PHP",
-            "time": "2016-03-11 00:59:18"
+            "time": "2016-03-11 01:33:12"
         }
     ],
     "packages-dev": [
@@ -1276,6 +1276,8 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": ">=7"
+    },
     "platform-dev": []
 }
