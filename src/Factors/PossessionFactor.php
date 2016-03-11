@@ -4,7 +4,7 @@ namespace Firehed\Auth\Factors;
 
 class PossessionFactor extends Factor {
 
-    public function getType() {
+    public function getType(): FactorType {
         return FactorType::POSSESSION();
     } // getType
 

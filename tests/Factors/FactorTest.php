@@ -65,6 +65,6 @@ class FactorTest extends \PHPUnit_Framework_TestCase {
 }
 
 class ConcreteFactor extends Factor {
-    public function getType() { }
+    public function getType(): FactorType { }
 }
 

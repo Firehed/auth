@@ -9,13 +9,13 @@ abstract class Factor {
 
     private $expiration;
 
-    abstract public function getType()/*: FactorType*/;
+    abstract public function getType(): FactorType;
 
     public function __construct(Secret $secret) {
         $this->secret = $secret;
     } // __construct
 
-    public function getSecret()/*: OpaqueEnvelope*/ {
+    public function getSecret(): Secret {
         return $this->secret;
     } // getSecret
 
@@ -23,7 +23,7 @@ abstract class Factor {
         return $this->expiration;
     } // getExpiration
 
-    public function setExpiration(DateTime $expiration)/*: this*/ {
+    public function setExpiration(DateTime $expiration): self {
         $this->expiration = $expiration;
         return $this;
     } // setExpiration
