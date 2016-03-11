@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "802b9cb5375ce0f85c77fe5c63b7c2f1",
-    "content-hash": "46dfd0724d9179d67f8a5faa1a31c5d5",
+    "hash": "b45b103f5e2aaf66e9b291986012f1f0",
+    "content-hash": "f29fc12b8c97ed4cffb8c253e755c76f",
     "packages": [
         {
             "name": "firehed/arctools",
@@ -85,21 +85,23 @@
         },
         {
             "name": "firehed/jwt",
-            "version": "1.1.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Firehed/jwt.git",
-                "reference": "f9f49a8067298d4235c43b6e3abeecc2c1e9c8c3"
+                "reference": "b6d7b2a9b9f6d436a23f49163ca6f280dac7d5e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Firehed/jwt/zipball/f9f49a8067298d4235c43b6e3abeecc2c1e9c8c3",
-                "reference": "f9f49a8067298d4235c43b6e3abeecc2c1e9c8c3",
+                "url": "https://api.github.com/repos/Firehed/jwt/zipball/b6d7b2a9b9f6d436a23f49163ca6f280dac7d5e3",
+                "reference": "b6d7b2a9b9f6d436a23f49163ca6f280dac7d5e3",
                 "shasum": ""
             },
             "require": {
                 "firehed/arctools": "*@dev",
-                "firehed/common": "*@dev"
+                "firehed/common": "*@dev",
+                "firehed/security": "^1.0",
+                "php": ">=7.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "*"
@@ -107,44 +109,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Firehed\\JWT\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Eric Stern",
-                    "email": "eric@ericstern.com"
-                }
-            ],
-            "description": "JSON Web Token tools",
-            "time": "2016-02-29 20:58:00"
-        },
-        {
-            "name": "firehed/security",
-            "version": "0.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Firehed/Security.git",
-                "reference": "6ae1d8b7c06a2515b610d801c81b0c220b8c6202"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Firehed/Security/zipball/6ae1d8b7c06a2515b610d801c81b0c220b8c6202",
-                "reference": "6ae1d8b7c06a2515b610d801c81b0c220b8c6202",
-                "shasum": ""
-            },
-            "require-dev": {
-                "firehed/arctools": "^1",
-                "phpunit/phpunit": "~4"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Firehed\\Security\\": [
+                    "Firehed\\JWT\\": [
                         "src/",
                         "tests/"
                     ]
@@ -160,8 +125,55 @@
                     "email": "eric@ericstern.com"
                 }
             ],
+            "description": "JSON Web Token tools",
+            "time": "2016-03-11 01:49:12"
+        },
+        {
+            "name": "firehed/security",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Firehed/Security.git",
+                "reference": "cb4add11539749a2b7b0da5fa0559a5ec1dc66ba"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Firehed/Security/zipball/cb4add11539749a2b7b0da5fa0559a5ec1dc66ba",
+                "reference": "cb4add11539749a2b7b0da5fa0559a5ec1dc66ba",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7"
+            },
+            "require-dev": {
+                "firehed/arctools": "^1",
+                "phpunit/phpunit": "~5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Firehed\\Security\\": [
+                        "src/",
+                        "tests/"
+                    ]
+                },
+                "files": [
+                    "src/HOTP.php",
+                    "src/TOTP.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Eric Stern",
+                    "email": "eric@ericstern.com"
+                }
+            ],
             "description": "Security tools for PHP",
-            "time": "2015-08-20 18:59:28"
+            "time": "2016-03-11 00:59:18"
         }
     ],
     "packages-dev": [

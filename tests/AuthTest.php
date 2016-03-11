@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Firehed\Auth;
 
@@ -7,7 +8,11 @@ use DateTime;
 use DateInterval;
 
 use Firehed\Security\Secret;
-use Firehed\JWT\JWT;
+use Firehed\JWT\{
+    Algorithm,
+    JWT,
+    KeyContainer
+};
 use Prophecy\Argument;
 use Prophecy\Prophecy\MethodProphecy;
 use Firehed\Auth\Factors\FactorType as Type;
@@ -128,10 +133,10 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
     } // testSetLoaderIsChainable
 
     /**
-     * @covers ::getToken
+     * @covers ::getEncodedToken
      */
     public function testGetToken() {
-        $uid = md5(time());
+        $uid = 'some user id';
 
         $u = $this->getUser(['k' => true]);
         $u->getID()
@@ -140,17 +145,17 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
         $a = new Auth();
         $a->setUser($u->reveal());
         $a->validateFactor($this->getFactor(Type::KNOWLEDGE())->reveal());
+        $a->setKeys($this->getKeyContainer());
 
-        $tok = $a->getToken();
-        $this->assertInstanceOf('Firehed\JWT\JWT', $tok,
-            'getToken did not return a JWT');
+        $tok = $a->getEncodedToken();
+        $this->assertTrue(is_string($tok), 'Encoded token was not a string');
 
         return [$tok, $uid];
     } // testGetToken
 
     /**
      * @covers ::getUser
-     * @covers ::setToken
+     * @covers ::setEncodedToken
      * @depends testGetToken
      */
     public function testGetUserReturnsUserFromToken(array $params) {
@@ -162,7 +167,8 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
             return $user;
         };
         $a = new Auth();
-        $u = $a->setToken($tok)
+        $u = $a->setKeys($this->getKeyContainer())
+            ->setEncodedToken($tok)
             ->setLoader($loader)
             ->getUser();
         $this->assertSame($user, $u,
@@ -183,11 +189,13 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
             'pfet' => null,
             'hst' => null,
         ];
+        $str = $this->getTokenFromClaims($claims);
+
         $user = $this->getUser()->reveal();
-        $tok = new JWT($claims);
         $a = new Auth();
+        $a->setKeys($this->getKeyContainer());
         $this->assertSame($user,
-            $a->setToken($tok)
+            $a->setEncodedToken($str)
                 ->setLoader(function($uid) use ($claims, $user) {
                     $this->assertSame($claims['uid'], $uid,
                         'Loader was passed the wrong UID');
@@ -382,13 +390,15 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
             'pfet' => null,
             'hst' => $this->getDateTime('P15M')->format(DateTime::ISO8601),
         ];
-        $tok = new JWT($claims);
+        $str = $this->getTokenFromClaims($claims);
 
         $user = $this->getUser()->reveal();
 
         $a = new Auth();
+        $a->setKeys($this->getKeyContainer());
+
         $this->assertSame($user,
-            $a->setToken($tok)
+            $a->setEncodedToken($str)
                 ->setRequiredLevel(Level::HISEC())
                 ->setLoader(function($uid) use ($claims, $user) {
                     $this->assertSame($claims['uid'], $uid,
@@ -416,13 +426,14 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
             'pfet' => null,
             'hst' => $this->getDateTime('-P15M')->format(DateTime::ISO8601),
         ];
-        $tok = new JWT($claims);
+        $str = $this->getTokenFromClaims($claims);
 
         $user = $this->getUser()->reveal();
 
         $a = new Auth();
+        $a->setKeys($this->getKeyContainer());
         $this->assertSame($user,
-            $a->setToken($tok)
+            $a->setEncodedToken($str)
                 ->setRequiredLevel(Level::HISEC())
                 ->setLoader(function($uid) use ($claims, $user) {
                     $this->assertSame($claims['uid'], $uid,
@@ -450,7 +461,7 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
             'pfet' => null,
             'hst' => null,
         ];
-        $tok = new JWT($claims);
+        $str = $this->getTokenFromClaims($claims);
 
         $user = $this->getUser(['p' => true]); // knowledge is already validated
         $user->getRequiredAuthenticationFactors()
@@ -459,7 +470,8 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
 
 
         $a = new Auth();
-        $a->setToken($tok)
+        $a->setKeys($this->getKeyContainer())
+            ->setEncodedToken($str)
             ->setLoader(function($uid) use ($claims, $user) {
                 $this->assertSame($claims['uid'], $uid,
                     'Loader was passed the wrong UID');
@@ -679,4 +691,16 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
         }
         return $dt;
     } // getDateTime
+
+    private function getKeyContainer(): KeyContainer {
+        $kc = new KeyContainer();
+        $kc->addKey(1, Algorithm::HMAC_SHA_256(), new Secret('top secret'));
+        return $kc;
+    }
+
+    private function getTokenFromClaims(array $claims): string {
+        return (new JWT($claims))
+            ->setKeys($this->getKeyContainer())
+            ->getEncoded();
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Firehed\Auth;
 
@@ -7,6 +8,7 @@ use Firehed\Auth\Factors\Factor;
 use Firehed\Auth\Factors\FactorType;
 use Firehed\Auth\Exceptions as AE;
 use Firehed\JWT\JWT;
+use Firehed\JWT\KeyContainer;
 use BadMethodCallException;
 
 class Auth {
@@ -23,16 +25,26 @@ class Auth {
     // High security timeout
     private $hst;
 
+    // Function to load the user by id
     private $loader;
 
+    // Minimum authentication level required
     private $required_level;
 
+    // List of factor types that must be provided to be fully authenticated
     private $required_factors = [];
-    private $nvbt; // not valid before time
 
+    // Not valid before time: used to invalidate older factors
+    private $nvbt;
+
+    // Time at start of request
     private $time;
 
+    // Loaded user
     private $user;
+
+    // KeyContainer to be used with JWT
+    private $keys;
 
     public function __construct() {
         // Store the instanciation time so that "for the rest of this request"
@@ -45,12 +57,15 @@ class Auth {
 
     // -( Accessors )----------------------------------------------------------
 
-    /**
-     * @return Firehed\JWT\JWT
-     */
-    public function getToken() {
-        return new JWT($this->getDataForJWT());
-    } // getToken
+    public function getEncodedToken(): string {
+        if (!$this->keys) {
+            throw new BadMethodCallException(
+                'call setKeys() before getEncodedToken()');
+        }
+        $jwt = new JWT($this->getDataForJWT());
+        $jwt->setKeys($this->keys);
+        return $jwt->getEncoded();
+    }
 
     public function getUser()/*: ?Authable */ {
         if ($this->required_level->is(Level::ANONYMOUS)) {
@@ -81,7 +96,16 @@ class Auth {
         return $this;
     } // setRequiredLevel
 
-    public function setToken(JWT $jwt)/*: this*/ {
+    public function setEncodedToken(string $token): self {
+        if (!$this->keys) {
+            throw new BadMethodCallException(
+                'call setKeys() before setEncodedToken()');
+        }
+        $this->setToken(JWT::fromEncoded($token, $this->keys));
+        return $this;
+    }
+
+    private function setToken(JWT $jwt)/*: this*/ {
         $claims = $jwt->getClaims();
         $this->uid = $claims['uid'];
         // Override any previously-set user to re-perform validation
@@ -108,6 +132,11 @@ class Auth {
         $this->expireAllFactors();
         return $this;
     } // setUser
+
+    public function setKeys(KeyContainer $keys)/*: this*/ {
+        $this->keys = $keys;
+        return $this;
+    }
 
     // -( High-security mode )-------------------------------------------------
 
