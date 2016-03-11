@@ -679,7 +679,7 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
         return $factor;
     } // getFactor
 
-    private function getDateTime($offset = '') {
+    private function getDateTime($offset = ''): DateTime {
         $dt = new DateTime();
         if ($offset) {
             if ($offset[0] == '-') {

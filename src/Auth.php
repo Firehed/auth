@@ -200,22 +200,22 @@ class Auth {
     } // validateFactor
 
 
-    public function isMissingUser() {
+    public function isMissingUser(): bool {
         $this->loadUser();
         return $this->user === null;
     }
 
-    public function isMissingKnowledgeFactor() {
+    public function isMissingKnowledgeFactor(): bool {
         return $this->isMissingFactor(FactorType::KNOWLEDGE(),
             $this->kfct,
             $this->kfet);
     }
-    public function isMissingPossessionFactor() {
+    public function isMissingPossessionFactor(): bool {
         return $this->isMissingFactor(FactorType::POSSESSION(),
             $this->pfct,
             $this->pfet);
     }
-    public function isMissingInherenceFactor() {
+    public function isMissingInherenceFactor(): bool {
         return $this->isMissingFactor(FactorType::INHERENCE(),
             $this->ifct,
             $this->ifet);
@@ -225,7 +225,7 @@ class Auth {
         FactorType $type,
         DateTime $create = null,
         DateTime $expire = null
-    ) {
+    ): bool {
         return $this->validateType($type, $create, $expire) !== self::RET_OK;
     }
     // -( Logout )-------------------------------------------------------------
@@ -248,7 +248,7 @@ class Auth {
         return $this;
     } // expireFactor
 
-    public function expireAllFactors() {
+    public function expireAllFactors(): self {
         $this->ifct = null;
         $this->ifet = null;
         $this->kfct = null;
@@ -259,7 +259,7 @@ class Auth {
         return $this;
     }
 
-    public function destroy() {
+    public function destroy(): self {
         $this->user = null;
         $this->uid = '';
         $this->expireAllFactors();
@@ -270,7 +270,7 @@ class Auth {
 
     // -( Internals:Accessors )------------------------------------------------
 
-    private function getDataForJWT()/*: array*/ {
+    private function getDataForJWT(): array {
         $fmt = function(DateTime $dt = null) {
             return $dt ? $dt->format(DateTime::ISO8601) : null;
         };
@@ -309,7 +309,7 @@ class Auth {
         return $this;
     } // assertFactorTimestamps
 
-    private function assertHighSecurity() {
+    private function assertHighSecurity(): self {
         if ($this->required_level->is(Level::HISEC)) {
             if (!$this->hst || $this->hst < $this->time) {
                 throw new AE\HighSecurityAuthenticationRequiredException([]);
@@ -350,7 +350,7 @@ class Auth {
 
     // -( Internals:Misc )-----------------------------------------------------
 
-    private function loadUser() {
+    private function loadUser()/* ?Authable */ {
         if ($this->required_level->is(Level::ANONYMOUS)) {
             return;
         }
