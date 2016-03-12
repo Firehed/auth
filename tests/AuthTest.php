@@ -235,6 +235,56 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers ::getPartiallyAuthenticatedUser
+     */
+    public function testGetPartiallyAuthenticatedUserWorksWhenInPartialMode() {
+        $a = new Auth();
+        $u = $this->getUser();
+        $u->getRequiredAuthenticationFactors()
+            ->willReturn([Factors\FactorType::KNOWLEDGE()]);
+        $u = $u->reveal();
+        $a->setUser($u);
+        $a->setRequiredLevel(Level::PARTIAL());
+        // Sanity checks
+        $this->assertTrue($a->isMissingKnowledgeFactor());
+        $this->assertNull($a->getUser());
+        // Actual test
+        $this->assertSame($u,
+            $a->getPartiallyAuthenticatedUser(),
+            'getPartiallyAuthenticatedUser did not return the user');
+    }
+
+
+    /**
+     * @covers ::getPartiallyAuthenticatedUser
+     * @covers ::isMissingUser
+     */
+    public function testGetPartiallyAuthenticatedUserThrowsWithNoUser() {
+        $a = new Auth();
+        $a->setLoader(function() {})
+            ->setRequiredLevel(Level::PARTIAL());
+        try {
+            $a->getPartiallyAuthenticatedUser();
+            $this->fail('Expected exception not thrown');
+        } catch (Exceptions\UserNotFoundException $e) {
+            $this->assertTrue($a->isMissingUser());
+        }
+    }
+
+    /**
+     * @covers ::getPartiallyAuthenticatedUser
+     */
+    public function testGetPartiallyAuthenticatedUserThrowsWhenNotInPartialMode() {
+        $a = new Auth();
+        $a->setLoader(function() {})
+            ->setRequiredLevel(Level::ANONYMOUS());
+        $this->expectException(BadMethodCallException::class);
+        $a->getPartiallyAuthenticatedUser();
+
+    }
+
+
+    /**
      * @covers ::getUser
      */
     public function testGetUserDoesNotThrowWhenUnauthUserIsPresentInPartialMode() {

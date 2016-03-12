@@ -83,6 +83,18 @@ class Auth {
         return $this->user;
     } // getUser
 
+    public function getPartiallyAuthenticatedUser()/*: ?Authable */ {
+        if (!$this->required_level->is(Level::PARTIAL)) {
+            throw new BadMethodCallException(
+                'Only use getPartiallyAuthenticatedUser in PARTIAL level');
+        }
+        $this->loadUser();
+        if (!$this->user) {
+            throw new AE\UserNotFoundException();
+        }
+        return $this->user;
+    }
+
     // -( Setters )------------------------------------------------------------
 
     public function setLoader(callable $loader): self {

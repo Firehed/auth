@@ -134,9 +134,12 @@ key rotation to be seamless and nearly-automatic
 * Levels: there are four authentication levels that a page can require:
   * `ANONYMOUS`: Users are not authenticated at all, nor will one be returned
     by `getUser`
-  * `PARTIAL`: Allows getUser() to return a user by ID regardless of how many
-    authentication factors are present. This SHOULD NOT be used outside of an
-    autentication upgrade flow; i.e. providing their OTP code or token.
+  * `PARTIAL`: Allows validation methods to be called on a partially-
+    authencitaed user, although getUser() will return null. This SHOULD NOT be
+    used outside of an autentication upgrade flow; i.e. providing their OTP
+    code or token. Use getPartiallyAuthenticatedUser() to get at the underlying
+    user, which SHOULD be used ONLY for modifying the user's new factor
+    registration (e.g. TOTP code provided didn't match)
   * `LOGIN`: Users require all of their factors to be present
   * `HISEC`: In addition to all factors being present, one must have been
     explicitly re-verified via the `enterHighSecurity` API
