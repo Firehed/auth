@@ -22,7 +22,7 @@ use Firehed\Security\Secret;
 $keys = new JWT\KeyContainer();
 $keys->addKey('20130101',
     JWT\Algorithm::HMAC_SHA_256(),
-    new Secret('some randomly-generated secret');
+    new Secret('some randomly-generated secret'));
 
 $auth = new Auth\Auth();
 $auth->setKeys($keys)
